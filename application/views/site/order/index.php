@@ -27,6 +27,8 @@
         });
     });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js" integrity="sha512-b94Z6431JyXY14iSXwgzeZurHHRNkLt9d6bAHt7BZT38eqV+GyngIi/tVye4jBKPYQ2lBdRs0glww4fmpuLRwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js" integrity="sha512-AA1Bzp5Q0K1KanKKmvN/4d3IRKVlv9PYgwFPvm32nPO6QS8yH1HO7LbgB1pgiOxPtfeg5zEn2ba64MUcqJx6CA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script type="text/javascript">
     function formatNumber(num) {
         return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
@@ -309,21 +311,21 @@
                 <div class="panel-body">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 clearpadding">
 
-                        <form enctype="multipart/form-data" method="post" >
+                        <form id="paymentForm" enctype="multipart/form-data" method="post" >
                             <table class="table" id="order_info">
                                 <tbody>
                                     <tr>
                                         <td style="width: 100px">Họ và tên</td>
-                                        <td><input style="min-width: 200px" type="text" value="<?php echo (!empty($user)) ? $user->name : ''; ?>" name="name"><?php echo form_error('name'); ?></td>
+                                        <td><input id="name" style="min-width: 200px" type="text" value="<?php echo (!empty($user)) ? $user->name : ''; ?>" name="name"><?php echo form_error('name'); ?></td>
 
                                     </tr>
                                     <tr>
                                         <td>Số điện thoại</td>
-                                        <td><input style="min-width: 200px" name="phone" type="text" value="<?php echo (!empty($user)) ? $user->phone : ''; ?>"><?php echo form_error('phone'); ?></td>
+                                        <td><input id="phone" style="min-width: 200px" name="phone" type="text" value="<?php echo (!empty($user)) ? $user->phone : ''; ?>"><?php echo form_error('phone'); ?></td>
                                     </tr>
                                     <tr>
                                         <td>Tỉnh,ThànhPhố</td>
-                                        <td><select  class="form-control" name="province" id="province" style="max-width: 200px;padding: 5px">
+                                        <td><select class="form-control" name="province" id="province" style="max-width: 200px;padding: 5px">
                                                 <option value>--Chọn Tỉnh,Thành phố--</option>
 
                                             </select>
@@ -354,12 +356,12 @@
                                     </tr>
                                     <tr>
                                         <td>Địa chỉ cụ thể</td>
-                                        <td><input style="min-width: 200px" name="area" type="text" value="<?php echo (!empty($user)) ? $user->address : ''; ?>"><?php echo form_error('address'); ?></td>
+                                        <td><input id="area" style="min-width: 200px" name="area" type="text" value="<?php echo (!empty($user)) ? $user->address : ''; ?>"><?php echo form_error('address'); ?></td>
                                         <td><input style="max-width: 200px" id="adress" name="adress" type="hidden" value=""></td>
                                     </tr>
                                     <tr>
                                         <td>Dịch vụ vận chuyển</td>
-                                        <td><select  class="form-control" name="ship" id="ship" style="max-width: 200px;padding: 5px">
+                                        <td><select class="form-control" name="ship" id="ship" style="max-width: 200px;padding: 5px">
                                                 <option value>--Chọn Dịch Vụ--</option>
 
                                             </select>
@@ -406,8 +408,14 @@
                                 </tbody>
                             </table>
                             <div class="col-lg-8">
+                                <input type="radio" style="width: 48px; margin-right: 12px" name="methodPayment">
                                 <div class="col-lg-5"><image style="width: 100%; height: 100%" src="<?php echo base_url(); ?>upload/van_chuyen.png" /></div>
                                 <div class="col-lg-5">Đơn vị vận chuyển<p>GHN - Giao hàng nhanh toàn quốc</p></div>
+                            </div>
+                            <div class="col-lg-8">
+                                <input onclick="payOnline()" type="radio" style="width: 48px; margin-right: 12px" name="methodPayment">
+                                <img src="https://play-lh.googleusercontent.com/dQbjuW6Jrwzavx7UCwvGzA_sleZe3-Km1KISpMLGVf1Be5N6hN6-tdKxE5RDQvOiGRg=w240-h480-rw" alt="">
+                                <div >Thanh toán online bằng ví momo</div>
                             </div>
                             <button style="min-width: 100px;float: right;margin-top: 50px" type="submit" class="btn btn-success">Xác nhận</button>
                         </form>
@@ -418,3 +426,82 @@
         </div>	
     </div>
 </div>
+<script>
+    var popupWindow;
+    async function payOnline() {
+        const name= document.getElementById("name").value
+        const phone=document.getElementById("phone").value
+        const province= document.getElementById("province").value
+        const district= document.getElementById("district").value
+        const ward= document.getElementById("ward").value
+        const area= document.getElementById("area").value
+        const ship= document.getElementById("ship").value
+        const ship_label=document.getElementById("ship_money").value
+        const amount=document.getElementById("total_amount").innerHTML.replaceAll(",", "")
+        const res=await axios({
+            url: "https://payment-momo.onrender.com/payment-momo",
+            method: "post",
+            data: {
+                platform: "web",
+                amount: 50000,
+                url_web: "http://localhost/shopbanquanao/payment-success.php"
+            }
+        })
+        const result=await res.data
+        localStorage.setItem("orderId", result.orderId)
+        localStorage.setItem("amount", result.amount)
+        localStorage.setItem("dataDelivery", JSON.stringify({name, phone, province,district,ward,area,ship,ship_label, amount}))
+        // window.location.href= result.payUrl
+        popupWindow= window.open(result.payUrl, "_blank", "width=1000, height= 600")
+        return result
+    }
+</script>
+<script>
+    
+    async function checkTransaction() {
+        
+        if(localStorage.getItem("orderId") && popupWindow) {
+            const name= document.getElementById("name")
+            const phone=document.getElementById("phone")
+            const province= document.getElementById("province")
+            const district= document.getElementById("district")
+            const ward= document.getElementById("ward")
+            const area= document.getElementById("area")
+            const ship= document.getElementById("ship")
+            const ship_label=document.getElementById("ship_money")
+            const amount=document.getElementById("total_amount")
+            const dataDelivery=JSON.parse(localStorage.getItem("dataDelivery"))
+            const orderId= localStorage.getItem("orderId")
+            const res=await axios({
+            url: "https://payment-momo.onrender.com/payment-status",
+            method: "post",
+            data: {
+                orderId: orderId,
+                amount: 50000,
+                url_web: "http://localhost/shopbanquanao/payment-success.php"
+            }
+        })
+            const result=await res.data
+            if(result?.resultCode== 0) {
+                swal("Thông báo", "Giao dịch thành công", "success")
+                .then(()=> {
+                    popupWindow.close()
+                    document.getElementById("paymentForm").submit()
+                })
+                .then(()=> {
+                    localStorage.removeItem("orderId")
+                    localStorage.removeItem("amount")
+                    localStorage.removeItem("dataDelivery")
+                })
+
+            }
+            else if(result?.resultCode !== 1000) {
+                swal("Thông báo", "Giao dịch thất bại ", "error")
+            }
+            console.log(result)
+        }
+    }
+    setInterval(()=> {
+        checkTransaction()
+    }, 3000);
+</script>

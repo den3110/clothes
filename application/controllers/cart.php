@@ -1,10 +1,12 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Cart extends MY_Controller {
+class Cart extends MY_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->load->library('cart');
@@ -16,7 +18,8 @@ class Cart extends MY_Controller {
         $this->load->helper('form');
     }
 
-    public function index() {
+    public function index()
+    {
         $message = $this->session->flashdata('message');
         $this->data['message'] = $message;
 
@@ -35,7 +38,8 @@ class Cart extends MY_Controller {
         $this->load->view('site/layoutsub', $this->data);
     }
 
-    public function add() {
+    public function add()
+    {
         $id = $this->uri->rsegment(3);
         $id = intval($id);
         $product = $this->product_model->get_info($id);
@@ -70,7 +74,7 @@ class Cart extends MY_Controller {
             redirect(base_url('cart'));
         } else {
             foreach ($carts as $key => $value) {
-                if ($value['id'] == $id && $value['qty'] >0) {
+                if ($value['id'] == $id && $value['qty'] > 0) {
                     $this->session->set_flashdata('message', 'Sản phẩm đã tồn tại');
                     redirect(base_url('cart'));
                 } else {
@@ -97,7 +101,8 @@ class Cart extends MY_Controller {
         }
     }
 
-    public function update() {
+    public function update()
+    {
         $carts = $this->cart->contents();
         $id = $this->uri->segment(3);
         $str = $this->uri->segment(4);
@@ -129,7 +134,8 @@ class Cart extends MY_Controller {
         redirect(base_url('cart'));
     }
 
-    public function del() {
+    public function del()
+    {
         $carts = $this->cart->contents();
         $id = $this->uri->segment(3);
         $id = intval($id);
@@ -151,13 +157,14 @@ class Cart extends MY_Controller {
         }
     }
 
-    public function newsize() {
+    public function newsize()
+    {
         $carts = $this->cart->contents();
         $id = $this->uri->segment(3);
         $product = $this->product_model->get_info($id);
         $data_size_index = array();
         foreach ($carts as $key => $value) {
-            if ($value['id'] == $id && $value['qty'] >0) {
+            if ($value['id'] == $id && $value['qty'] > 0) {
                 array_push($data_size_index, $value['size']);
             }
         }
@@ -192,7 +199,8 @@ class Cart extends MY_Controller {
         }
     }
 
-    public function sumsize() {
+    public function sumsize()
+    {
         //lấy size
         $carts = $this->cart->contents();
         $cardid = $this->uri->segment(3);
@@ -200,7 +208,7 @@ class Cart extends MY_Controller {
         $product = $this->product_model->get_info($id);
         $data_size_index = array();
         foreach ($carts as $key => $value) {
-            if ($value['id'] == $id && $value['qty'] >0) {
+            if ($value['id'] == $id && $value['qty'] > 0) {
                 array_push($data_size_index, $value['size']);
             }
         }
@@ -238,7 +246,8 @@ class Cart extends MY_Controller {
             redirect(base_url('cart'));
         }
     }
-    public function subsize() {
+    public function subsize()
+    {
         //lấy size
         $carts = $this->cart->contents();
         $cardid = $this->uri->segment(3);
@@ -246,7 +255,7 @@ class Cart extends MY_Controller {
         $product = $this->product_model->get_info($id);
         $data_size_index = array();
         foreach ($carts as $key => $value) {
-            if ($value['id'] == $id && $value['qty'] >0) {
+            if ($value['id'] == $id && $value['qty'] > 0) {
                 array_push($data_size_index, $value['size']);
             }
         }

@@ -51,6 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 $route['dang-nhap'] = 'user/login';
+$route['payment-success'] = 'user/payment';
 $route['dang-ky'] = 'user/register';
 $route['ban-chay'] = 'product/hot';
 $route['moi'] = 'product/news';

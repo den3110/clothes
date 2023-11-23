@@ -23,11 +23,11 @@
 							<h4 style="color:red;text-align: center;margin-top: 30px"><?php echo $message_fail; ?></h4>
 						<?php } ?>
 				  <div class="panel-body">
-				  	<form class="form-horizontal" method="post" action="<?php echo base_url('user/register'); ?>">
+				  	<form id="signupForm" class="form-horizontal" method="post" action="<?php echo base_url('user/register'); ?>">
 					  <div class="form-group">
-					    <label for="inputEmail3" class="col-sm-offset-2 col-sm-2 control-label">Họ tên</label>
+					    <label for="fullName" class="col-sm-offset-2 col-sm-2 control-label">Họ tên</label>
 					    <div class="col-sm-4">
-					      <input type="text" class="form-control" id="inputEmail3" placeholder="" name="name" value="<?php echo set_value('name'); ?>">
+					      <input type="text" class="form-control" id="fullName" placeholder="" name="name" value="<?php echo set_value('name'); ?>">
 					    </div>
 					    <div class="col-sm-3">
 				    	<?php echo form_error('name'); ?>
@@ -43,36 +43,36 @@
 					</div>
 					  </div>
 					  <div class="form-group">
-					    <label for="inputEmail3" class="col-sm-offset-2 col-sm-2 control-label">Mật khẩu</label>
+					    <label for="password" class="col-sm-offset-2 col-sm-2 control-label">Mật khẩu</label>
 					    <div class="col-sm-4">
-					      <input type="password" class="form-control" id="inputEmail3" placeholder="" name="password">
+					      <input type="password" class="form-control" id="password" placeholder="" name="password">
 					    </div>
 					    <div class="col-sm-3">
 				    	<?php echo form_error('password'); ?>
 					</div>
 					  </div>
 					  <div class="form-group">
-					    <label for="inputEmail3" class=" col-sm-offset-2 col-sm-2 control-label">Nhập lại mật khẩu</label>
+					    <label for="confirmPassword" class=" col-sm-offset-2 col-sm-2 control-label">Nhập lại mật khẩu</label>
 					    <div class="col-sm-4">
-					      <input type="password" class="form-control" id="inputEmail3" placeholder="" name="re_password">
+					      <input type="password" class="form-control" id="confirmPassword" placeholder="" name="re_password">
 					    </div>
 					    <div class="col-sm-3">
 				    	<?php echo form_error('re_password'); ?>
 					</div>
 					  </div>
 					  <div class="form-group">
-					    <label for="inputEmail3" class="col-sm-offset-2 col-sm-2 control-label">Địa chỉ</label>
+					    <label for="address" class="col-sm-offset-2 col-sm-2 control-label">Địa chỉ</label>
 					    <div class="col-sm-4">
-					      <input type="text" class="form-control" id="inputEmail3" placeholder="" name="address" value="<?php echo set_value('address'); ?>">
+					      <input type="text" class="form-control" id="address" placeholder="" name="address" value="<?php echo set_value('address'); ?>">
 					    </div>
 					    <div class="col-sm-3">
 				    	<?php echo form_error('address'); ?>
 					</div>
 					  </div>
 					  <div class="form-group">
-					    <label for="inputEmail3" class="col-sm-offset-2 col-sm-2 control-label">Số điện thoại</label>
+					    <label for="phoneNumber" class="col-sm-offset-2 col-sm-2 control-label">Số điện thoại</label>
 					    <div class="col-sm-4">
-					      <input type="text" class="form-control" id="inputEmail3" placeholder="" name="phone" value="<?php echo set_value('phone'); ?>">
+					      <input type="text" class="form-control" id="phoneNumber" placeholder="" name="phone" value="<?php echo set_value('phone'); ?>">
 					    </div>
 					    <div class="col-sm-3">
 				    	<?php echo form_error('phone'); ?>
@@ -83,6 +83,11 @@
 					      <button type="submit" class="btn btn-success">Đăng ký</button>
 					    </div>
 					  </div>
+					  <div class="form-group">
+							<div class="col-sm-offset-4">
+								<button type="button" class="login-with-google-btn" onclick="openGoogleSignInPopup()">Đăng ký bằng google</button>
+							</div>
+						</div>
 					</form>				  	
 				  </div>
 
@@ -93,6 +98,93 @@
 	</div>
     
     <script src="<?php echo public_url('site/'); ?>bootstrap/js/bootstrap.min.js"></script>
+	<script src="<?php echo public_url('site/'); ?>bootstrap/js/bootstrap.min.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-storage.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-database.js"></script>
+	<script>
+		// app.js
+		const firebaseConfig = {
+			apiKey: "AIzaSyANSwlR-gyTKxCBCdhhWHgbB5Fg5-ODJ3c",
+			authDomain: "tourism-de1ac.firebaseapp.com",
+			databaseURL: "https://tourism-de1ac-default-rtdb.asia-southeast1.firebasedatabase.app",
+			projectId: "tourism-de1ac",
+			storageBucket: "tourism-de1ac.appspot.com",
+			messagingSenderId: "204093368364",
+			appId: "1:204093368364:web:88baf7f0e2582e3f4cc989",
+			measurementId: "G-XVC8PLLSJF"
+		};
+
+		firebase.initializeApp(firebaseConfig);
+	</script>
+	<script>
+		function openGoogleSignInPopup() {
+			var provider = new firebase.auth.GoogleAuthProvider();
+
+			firebase.auth().signInWithPopup(provider)
+				.then(function(result) {
+					// Xử lý khi người dùng đăng nhập thành công
+					var user = result.user;
+					document.getElementById("inputEmail3").value= user.email
+					document.getElementById("password").value= user.uid
+					document.getElementById("confirmPassword").value= user.uid
+					document.getElementById("phoneNumber").value= user.phoneNumber || "0123456789"
+					document.getElementById("fullName").value= user.displayName
+					document.getElementById("address").value= ""
+					document.getElementById("signupForm").submit()
+					console.log(user);
+				})
+				.catch(function(error) {
+					// Xử lý lỗi đăng nhập
+					console.error(error);
+				});
+		}
+	</script>
 </body>
 <?php $this->load->view('site/footer',$this->data); ?>
 </html>
+<style>
+	.login-with-google-btn {
+		transition: background-color .3s, box-shadow .3s;
+
+		padding: 12px 16px 12px 42px;
+		border: none;
+		border-radius: 3px;
+		box-shadow: 0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25);
+
+		color: #757575;
+		font-size: 14px;
+		font-weight: 500;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+
+		background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4YzIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+		background-color: white;
+		background-repeat: no-repeat;
+		background-position: 12px 11px;
+
+		&:hover {
+			box-shadow: 0 -1px 0 rgba(0, 0, 0, .04), 0 2px 4px rgba(0, 0, 0, .25);
+		}
+
+		&:active {
+			background-color: #eeeeee;
+		}
+
+		&:focus {
+			outline: none;
+			box-shadow:
+				0 -1px 0 rgba(0, 0, 0, .04),
+				0 2px 4px rgba(0, 0, 0, .25),
+				0 0 0 3px #c8dafc;
+		}
+
+		&:disabled {
+			filter: grayscale(100%);
+			background-color: #ebebeb;
+			box-shadow: 0 -1px 0 rgba(0, 0, 0, .04), 0 1px 1px rgba(0, 0, 0, .25);
+			cursor: not-allowed;
+		}
+	}
+</style>
